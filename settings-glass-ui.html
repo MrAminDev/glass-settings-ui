@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glass Settings UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1: #0d0818;
+    --bg-2: #1a0f33;
+    --violet: #8b5cf6;
+    --magenta: #e64ac9;
+    --cyan: #5eead4;
+    --glass: rgba(255,255,255,0.07);
+    --glass-border: rgba(255,255,255,0.14);
+    --ink: #f1ecff;
+    --ink-dim: rgba(241,236,255,0.62);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  body{
+    min-height:100vh;
+    background: radial-gradient(circle at 20% 10%, #2a1155 0%, transparent 45%),
+                radial-gradient(circle at 85% 25%, #4a0f6b 0%, transparent 40%),
+                radial-gradient(circle at 50% 90%, #150a33 0%, transparent 50%),
+                linear-gradient(160deg, var(--bg-1), var(--bg-2));
+    font-family: 'Manrope', sans-serif;
+    color: var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 40px 16px;
+    overflow-x:hidden;
+    position:relative;
+  }
+
+  /* ambient aurora blobs — the signature motion element */
+  .aurora{
+    position:fixed; border-radius:50%;
+    filter: blur(90px);
+    opacity:0.5;
+    z-index:0;
+    animation: drift 14s ease-in-out infinite;
+  }
+  .aurora.a1{ width:340px; height:340px; background:var(--violet); top:-80px; left:-60px; }
+  .aurora.a2{ width:300px; height:300px; background:var(--magenta); bottom:-60px; right:-40px; animation-delay:-5s; }
+  .aurora.a3{ width:220px; height:220px; background:var(--cyan); top:45%; left:60%; animation-delay:-9s; opacity:0.28; }
+
+  @keyframes drift{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    50%{ transform: translate(30px,-25px) scale(1.12); }
+  }
+
+  .stage{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+  }
+
+  /* ---------- main panel ---------- */
+  .panel{
+    width:340px;
+    background: var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:32px;
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+    padding:26px 22px 20px;
+    position:relative;
+  }
+
+  .panel::before{
+    content:"";
+    position:absolute; inset:0;
+    border-radius:32px;
+    padding:1px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 40%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events:none;
+  }
+
+  .panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
+  }
+
+  .panel-head h1{
+    font-family:'Baloo 2', sans-serif;
+    font-size:30px;
+    font-weight:800;
+    letter-spacing:-0.3px;
+    background: linear-gradient(90deg, #fff, #d9c9ff 70%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+
+  .close-btn{
+    width:34px; height:34px;
+    border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.08);
+    border:1px solid var(--glass-border);
+    color:var(--ink-dim);
+    cursor:pointer;
+    transition: all .2s ease;
+  }
+  .close-btn:hover{ background: rgba(255,255,255,0.16); color:#fff; transform:rotate(90deg); }
+
+  .search{
+    display:flex; align-items:center; gap:10px;
+    background: rgba(255,255,255,0.06);
+    border:1px solid var(--glass-border);
+    border-radius:16px;
+    padding:12px 16px;
+    margin-bottom:22px;
+    transition: box-shadow .25s ease, border-color .25s ease;
+  }
+  .search:focus-within{
+    border-color: rgba(139,92,246,0.7);
+    box-shadow: 0 0 0 4px rgba(139,92,246,0.18);
+  }
+  .search input{
+    background:none; border:none; outline:none;
+    color:var(--ink); font-family:inherit; font-size:14.5px;
+    width:100%;
+  }
+  .search input::placeholder{ color: var(--ink-dim); }
+  .search svg{ flex-shrink:0; opacity:0.75; }
+
+  .group{ margin-bottom:16px; }
+  .group + .group{ border-top:1px solid rgba(255,255,255,0.09); padding-top:12px; }
+
+  .item{
+    display:flex; align-items:center; gap:14px;
+    padding:12px 10px;
+    border-radius:14px;
+    cursor:pointer;
+    transition: background .2s ease, transform .2s ease, padding-left .2s ease;
+    position:relative;
+  }
+  .item:hover{
+    background: linear-gradient(90deg, rgba(139,92,246,0.22), rgba(230,74,201,0.10));
+    padding-left:16px;
+  }
+  .item .ic{
+    width:38px; height:38px;
+    border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    background: rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.08);
+    flex-shrink:0;
+    transition: background .2s ease, box-shadow .2s ease;
+  }
+  .item:hover .ic{
+    background: linear-gradient(135deg, var(--violet), var(--magenta));
+    box-shadow: 0 4px 16px rgba(139,92,246,0.5);
+  }
+  .item span{ font-size:15.5px; font-weight:600; color: var(--ink); }
+  .item small{ display:block; font-size:11.5px; color:var(--ink-dim); font-weight:400; margin-top:1px; }
+  .item .chev{ margin-left:auto; opacity:0.4; transition: transform .2s ease, opacity .2s ease; }
+  .item:hover .chev{ opacity:0.9; transform: translateX(3px); }
+
+  /* ---------- collapsed rail ---------- */
+  .rail{
+    width:64px;
+    background: var(--glass);
+    border:1px solid var(--glass-border);
+    border-radius:26px;
+    backdrop-filter: blur(22px) saturate(140%);
+    -webkit-backdrop-filter: blur(22px) saturate(140%);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+    padding:18px 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .rail .ric{
+    width:40px; height:40px;
+    border-radius:13px;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--ink-dim);
+    cursor:pointer;
+    transition: all .2s ease;
+    margin:3px 0;
+  }
+  .rail .ric:hover{
+    color:#fff;
+    background: rgba(255,255,255,0.09);
+  }
+  .rail .ric.active{
+    color:#fff;
+    background: linear-gradient(135deg, var(--violet), var(--magenta));
+    box-shadow: 0 4px 14px rgba(139,92,246,0.55);
+  }
+  .rail .divider{ width:26px; height:1px; background: rgba(255,255,255,0.12); margin:6px 0; }
+
+  .watermark{
+    position:fixed; bottom:18px; left:0; right:0;
+    text-align:center;
+    font-size:12px;
+    letter-spacing:0.5px;
+    color: rgba(241,236,255,0.35);
+    z-index:1;
+  }
+  .watermark b{ color: rgba(241,236,255,0.6); }
+
+  @media (max-width:460px){
+    .stage{ transform: scale(0.86); }
+  }
+</style>
+</head>
+<body>
+
+<div class="aurora a1"></div>
+<div class="aurora a2"></div>
+<div class="aurora a3"></div>
+
+<div class="stage">
+  <div class="panel">
+    <div class="panel-head">
+      <h1>Settings</h1>
+      <div class="close-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </div>
+    </div>
+
+    <div class="search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search settings">
+    </div>
+
+    <div class="group" id="menu"></div>
+  </div>
+
+  <div class="rail" id="rail"></div>
+</div>
+
+<div class="watermark">UI concept &middot; <b>Amin Dev</b></div>
+
+<script>
+  const items = [
+    { g:1, icon:'wifi',   label:'Network & Internet', sub:'VPN, Wi-Fi, data usage' },
+    { g:1, icon:'device', label:'Connected devices',  sub:'Bluetooth, pairing' },
+    { g:2, icon:'contrast', label:'Display', sub:'Brightness, dark theme' },
+    { g:2, icon:'bell',   label:'Notifications', sub:'App alerts, sound' },
+    { g:2, icon:'battery',label:'Battery', sub:'Usage, saver mode' },
+    { g:2, icon:'storage',label:'Storage', sub:'12.4 GB used of 128 GB' },
+    { g:3, icon:'pin',    label:'Location', sub:'App permissions' },
+    { g:3, icon:'access', label:'Accessibility', sub:'Display, interaction' },
+    { g:4, icon:'grid',   label:'Apps', sub:'Default apps, permissions' },
+    { g:4, icon:'sound',  label:'Sound & vibration', sub:'Volume, ringtone' },
+  ];
+
+  const icons = {
+    wifi:'<path d="M2 8.5a16 16 0 0 1 20 0"/><path d="M5 12a11 11 0 0 1 14 0"/><path d="M8.5 15.5a6 6 0 0 1 7 0"/><circle cx="12" cy="19" r="1" fill="currentColor" stroke="none"/>',
+    device:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
+    contrast:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18Z" fill="currentColor" stroke="none"/>',
+    bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+    battery:'<rect x="2" y="8" width="17" height="8" rx="2"/><path d="M22 11v2"/><path d="M6 8v8" stroke-width="0"/>',
+    storage:'<rect x="3" y="4" width="18" height="5" rx="1.5"/><rect x="3" y="10" width="18" height="5" rx="1.5"/><rect x="3" y="16" width="18" height="4" rx="1.5"/><circle cx="7" cy="6.5" r=".6" fill="currentColor" stroke="none"/>',
+    pin:'<path d="M12 22s7-7.5 7-13a7 7 0 0 0-14 0c0 5.5 7 13 7 13Z"/><circle cx="12" cy="9" r="2.4"/>',
+    access:'<circle cx="12" cy="4.5" r="1.7"/><path d="M4 9l8 2 8-2M12 11v10M8 21l4-6 4 6"/>',
+    grid:'<rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>',
+    sound:'<path d="M4 9v6h4l6 5V4L8 9H4Z"/><path d="M17 9a4 4 0 0 1 0 6"/>',
+    menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',
+    search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  };
+
+  const svg = (name, size=18) =>
+    `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${icons[name]}</svg>`;
+
+  const menu = document.getElementById('menu');
+  let lastG = null;
+  items.forEach(it=>{
+    if(lastG !== null && it.g !== lastG){
+      menu.insertAdjacentHTML('beforeend', `<div style="border-top:1px solid rgba(255,255,255,0.09);margin:10px 0;"></div>`);
+    }
+    lastG = it.g;
+    menu.insertAdjacentHTML('beforeend', `
+      <div class="item">
+        <div class="ic">${svg(it.icon)}</div>
+        <div>
+          <span>${it.label}</span>
+          <small>${it.sub}</small>
+        </div>
+        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m9 6 6 6-6 6"/></svg>
+      </div>`);
+  });
+
+  const rail = document.getElementById('rail');
+  const railIcons = ['menu','search',null,'wifi','device',null,'contrast','bell','battery','storage',null,'pin','access',null,'grid','sound'];
+  railIcons.forEach((name,i)=>{
+    if(name === null){
+      rail.insertAdjacentHTML('beforeend', `<div class="divider"></div>`);
+    } else {
+      rail.insertAdjacentHTML('beforeend', `<div class="ric ${i===3?'active':''}">${svg(name,17)}</div>`);
+    }
+  });
+
+  document.querySelectorAll('.rail .ric').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.rail .ric').forEach(x=>x.classList.remove('active'));
+      el.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
