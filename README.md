@@ -4,7 +4,7 @@ A single-file recreation of a mobile settings screen, built to explore glassmorp
 
 ## Preview
 
-*(add a screenshot or short gif here — drag the file into the repo and link it, e.g. `![preview](preview.gif)`)*
+![preview](preview.gif)
 
 ## Features
 
